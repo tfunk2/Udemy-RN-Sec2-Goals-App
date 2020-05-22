@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import { 
   StyleSheet, 
-  Text, 
   View, 
-  TextInput, 
   Button, 
-  ScrollView, 
   FlatList
 } from 'react-native';
 
@@ -15,12 +12,17 @@ import GoalInput from './components/GoalInput'
 export default function App() {
 
   const [courseGoals, setCourseGoals] = useState([]);
+  const [isAddMode, setIsAddMode] = useState(false);
 
   const addGoalHandler = (enteredGoal) => {
+    if (enteredGoal.length === 0) {
+      return;
+    }
     setCourseGoals( currentGoals => [
       ...currentGoals, 
       { id: Math.random().toString(), value: enteredGoal }
     ])
+    setIsAddMode(false)
   }
 
   const removeGoalHandler = (goalId) => {
@@ -28,10 +30,15 @@ export default function App() {
       return currentGoals.filter(goal => goal.id !== goalId)
     })
   }
+  
+  const cancelGoalAddHandler = () => {
+    setIsAddMode(false)
+  }
 
   return (
     <View style={styles.container}>
-      <GoalInput addGoalHandler={addGoalHandler} />
+      <Button title="Add New Goal" onPress={() => setIsAddMode(true)} />
+      <GoalInput onCancel={cancelGoalAddHandler} visible={isAddMode} addGoalHandler={addGoalHandler} />
       <FlatList 
         data={courseGoals} 
         renderItem={itemData => <GoalItem id={itemData.item.id} onDelete={removeGoalHandler} title={itemData.item.value} />} 
